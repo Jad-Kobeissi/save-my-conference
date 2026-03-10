@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  plan         String   @default("free")
+  role         String   @default("user")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  usageQuiz    Int      @default(0)
+  usageCrisis  Int      @default(0)
+  usageDebate  Int      @default(0)
+  usageSpeech  Int      @default(0)
+
+  conferences  Conference[]
+  libraryFiles LibraryFile[]
+  logs         ActivityLog[]
+}
+
+model Conference {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  name          String
+  committee     String
+  country       String
+  topic         String
+  eventDatetime String
+  summary       String?
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LibraryFile {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  originalName  String
+  storedName    String
+  fileType      String
+  extractedText String?
+  uploadedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
