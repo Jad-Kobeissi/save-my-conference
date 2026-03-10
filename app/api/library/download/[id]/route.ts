@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { UPLOAD_DIR } from "@/lib/files";
 import fs from "fs/promises";
 import path from "path";
 
@@ -13,9 +14,14 @@ export async function GET(
   const user = await requireUser();
   const { id } = await params;
 
+  const numId = Number(id);
+  if (isNaN(numId)) {
+    return new NextResponse("Invalid ID", { status: 400 });
+  }
+
   const file = await prisma.libraryFile.findFirst({
     where: {
-      id: Number(id),
+      id: numId,
       userId: user.id
     }
   });
@@ -24,7 +30,7 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 });
   }
 
-  const full = path.join(process.cwd(), "uploads", file.storedName);
+  const full = path.join(UPLOAD_DIR, file.storedName);
 
   try {
     const data = await fs.readFile(full);

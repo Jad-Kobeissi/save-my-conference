@@ -19,8 +19,11 @@ export async function getCurrentUser() {
   const id = store.get(COOKIE_NAME)?.value;
   if (!id) return null;
 
+  const numId = Number(id);
+  if (isNaN(numId)) return null;
+
   const user = await prisma.user.findUnique({
-    where: { id: Number(id) }
+    where: { id: numId }
   });
 
   if (!user || !user.isActive) return null;

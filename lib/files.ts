@@ -1,9 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
+import os from "os";
 import mammoth from "mammoth";
 import pdfParse from "pdf-parse";
 
-export const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+export const UPLOAD_DIR = path.join(os.tmpdir(), "savemyconf-uploads");
 export const ALLOWED_EXTENSIONS = new Set(["txt", "pdf", "docx"]);
 
 export async function ensureUploadDir() {
