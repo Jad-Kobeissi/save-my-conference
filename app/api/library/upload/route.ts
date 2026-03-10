@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { allowedFile, extractText, saveIncomingFile } from "@/lib/files";
 import { logAction } from "@/lib/logs";
+import { redirect } from "next/navigation";
 
 export const runtime = "nodejs";
 
@@ -30,5 +31,5 @@ export async function POST(request: Request) {
   }
 
   await logAction(user.id, "upload_library", `${files.length} file(s)`);
-  return NextResponse.redirect(new URL("/dashboard", request.url));
+  redirect("/dashboard")
 }
