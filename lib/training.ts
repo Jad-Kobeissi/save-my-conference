@@ -83,3 +83,69 @@ Return ONLY a JSON object with the following structure:
     throw new Error("Invalid AI response");
   }
 }
+
+export async function buildQuiz(topic: string, context: string) {
+  const prompt = `
+You are an expert Model United Nations (MUN) Chair and Trainer.
+Generate a 5-question multiple choice quiz to test a delegate's knowledge on the topic: "${topic}".
+
+Use the following research context (if provided) to heavily inform the questions, ensuring they test actual substantive knowledge rather than generic trivia:
+"""
+${context}
+"""
+
+Return ONLY a JSON array of objects with the following structure:
+[
+  {
+    "kind": "Multiple Choice",
+    "question": "The main question text here?",
+    "statement": "Optional contextual statement preceding the question.",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "answer": "Option B", 
+    "explanation": "A short explanation of why this answer is correct."
+  }
+]
+`;
+
+  const responseText = await generateText(prompt);
+  if (!responseText) throw new Error("Failed to generate quiz");
+
+  const jsonMatch = responseText.match(/\\[[\\s\\S]*\\]/);
+  const cleanJson = jsonMatch ? jsonMatch[0] : responseText;
+
+  try {
+    return JSON.parse(cleanJson);
+  } catch (e) {
+    throw new Error("Invalid AI response");
+  }
+}
+
+export async function buildDebate(yourCountry: string, opponentCountry: string, topic: string, context: string) {
+  const prompt = `
+You are an expert Model United Nations (MUN) participant representing ${opponentCountry} in a debate against ${yourCountry} regarding the topic: "${topic}".
+
+Use the following research context (if provided) to ensure the arguments directly challenge or respond to the specific interests, assets, or positions of ${yourCountry}:
+"""
+${context}
+"""
+
+Return ONLY a JSON object with the following structure:
+{
+  "opener": "A strong 2-3 sentence opening statement by ${opponentCountry} directly addressing and challenging ${yourCountry}'s stance.",
+  "pressurePoints": ["A key vulnerability in ${yourCountry}'s argument", "A policy contradiction or weakness to exploit"],
+  "bestCounters": ["A strong counter-argument ${yourCountry} can use against ${opponentCountry}", "A strategic pivot to regain leverage"]
+}
+`;
+
+  const responseText = await generateText(prompt);
+  if (!responseText) throw new Error("Failed to generate debate response");
+
+  const jsonMatch = responseText.match(/\\{[\\s\\S]*\\}/);
+  const cleanJson = jsonMatch ? jsonMatch[0] : responseText;
+
+  try {
+    return JSON.parse(cleanJson);
+  } catch (e) {
+    throw new Error("Invalid AI response");
+  }
+}
