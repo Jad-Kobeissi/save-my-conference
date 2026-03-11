@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { setUserSession, verifyPassword } from "@/lib/auth";
 import { logAction } from "@/lib/logs";
+import { redirect } from "next/navigation";
 
 export async function POST(request: Request) {
   const data = await request.formData();
@@ -21,5 +22,5 @@ export async function POST(request: Request) {
   await setUserSession(user.id);
   await logAction(user.id, "login", "User logged in");
 
-  return NextResponse.redirect(new URL("/dashboard", request.url));
+  redirect("/dashboard")
 }
