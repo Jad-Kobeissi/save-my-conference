@@ -46,7 +46,7 @@ export default async function DashboardPage() {
             <label>Committee<input name="committee" required /></label>
             <label>Country<input name="country" required /></label>
             <label>Topic<input name="topic" required /></label>
-            <label>Date and time<input type="datetime-local" name="eventDatetime" required defaultValue={new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)} /></label>
+            <label>Date and time<input type="datetime-local" name="eventDatetime" required defaultValue={new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)} /></label>
             <label>Summary<textarea name="summary" rows={4} placeholder="Main notes, goals, strategy..."></textarea></label>
             <button className="btn primary" type="submit">Save conference</button>
           </form>
@@ -98,10 +98,10 @@ export default async function DashboardPage() {
         <section className="paper">
           <div className="section-head"><h3>Tool Access</h3></div>
           <div className="tool-grid">
-            <Link className="tool-card" href="/speech-lab"><strong>Speech Lab</strong><span>Evaluate speeches and tighten rhetoric.</span></Link>
-            <Link className="tool-card" href="/quiz"><strong>Quiz Arena</strong><span>Generate practice questions from your material.</span></Link>
-            <Link className="tool-card" href="/crisis"><strong>Crisis Simulator</strong><span>Practice emergency responses under pressure.</span></Link>
-            <Link className="tool-card" href="/debate"><strong>Debate Arena</strong><span>Train against a simulated opponent country.</span></Link>
+            <Link className="tool-card" href="/speech-lab"><strong>Speech Lab</strong><span> Evaluate speeches and tighten rhetoric.</span></Link>
+            <Link className="tool-card" href="/quiz"><strong>Quiz Arena</strong><span> Generate practice questions from your material.</span></Link>
+            <Link className="tool-card" href="/crisis"><strong>Crisis Simulator</strong><span> Practice emergency responses under pressure.</span></Link>
+            <Link className="tool-card" href="/debate"><strong>Debate Arena</strong><span> Train against a simulated opponent country.</span></Link>
           </div>
         </section>
       </div>
