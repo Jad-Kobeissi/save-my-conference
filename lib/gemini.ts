@@ -11,7 +11,7 @@ export async function generateText(prompt: string) {
   if (!client) return null;
 
   const response = await client.models.generateContent({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-2.5-pro",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
