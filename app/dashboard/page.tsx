@@ -70,7 +70,12 @@ export default async function DashboardPage() {
                   <strong>{file.originalName}</strong>
                   <p>{file.fileType.toUpperCase()} • {new Date(file.uploadedAt).toLocaleString()}</p>
                 </div>
-                <a className="ghost-link" href={`/api/library/download/${file.id}`}>Download</a>
+                <div style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+                  <a className="btn secondary" href={`/api/library/download/${file.id}`} style={{ paddingBlock: 5, paddingInline: 20 }}>Download</a>
+                  <form action={`/api/library/delete/${file.id}`} method="post">
+                    <button className="btn danger" type="submit" style={{ paddingBlock: 5, paddingInline: 33 }}>Delete</button>
+                  </form>
+                </div>
               </div>
             )) : <p className="subtle">No research uploaded yet.</p>}
           </div>
