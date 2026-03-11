@@ -51,3 +51,35 @@ ${speechText}
     throw new Error("Invalid AI response");
   }
 }
+
+export async function buildCrisis(topic: string, country: string, committee: string, context: string) {
+  const prompt = `
+You are an expert Model United Nations (MUN) Crisis Director.
+Generate a sudden, high-stakes crisis scenario for ${country} in the ${committee} committee regarding the topic: "${topic}".
+
+Use the following research context (if provided) to ensure the scenario directly threatens or involves their specific interests, assets, or recent actions:
+"""
+${context}
+"""
+
+Return ONLY a JSON object with the following structure:
+{
+  "scenario": "A 2-3 sentence description of the immediate crisis event that just occurred.",
+  "intel": "A brief intelligence report or specific operational detail relevant to the country's position.",
+  "tasks": ["Task 1", "Task 2", "Task 3"],
+  "benchmarks": ["Benchmark 1", "Benchmark 2", "Benchmark 3"]
+}
+`;
+
+  const responseText = await generateText(prompt);
+  if (!responseText) throw new Error("Failed to generate crisis scenario");
+
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+  const cleanJson = jsonMatch ? jsonMatch[0] : responseText;
+
+  try {
+    return JSON.parse(cleanJson);
+  } catch (e) {
+    throw new Error("Invalid AI response");
+  }
+}
