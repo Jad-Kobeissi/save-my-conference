@@ -1,56 +1,53 @@
 import { generateText } from "./gemini";
 
-/**
- * Analyzes MUN speeches with a focus on incremental improvement.
- * @param speechText The current version of the speech.
- * @param previousScore Optional: The score from the last attempt to ensure progression.
- */
 export async function analyzeSpeech(speechText: string, previousScore?: number) {
   const prompt = `
-You are a Senior MUN Chair. You are evaluating a speech.
-${previousScore ? `IMPORTANT: The user's previous draft scored ${previousScore}/100. If this version shows effort and fixes previous errors, you MUST reward them with a higher score.` : "This is the user's first draft. Grade it fairly but strictly."}
+You are a Senior MUN Chair. Your goal is to provide a STABLE and PROGRESSIVE grade.
+${previousScore ? `PREVIOUS RECORDED SCORE: ${previousScore}/100.` : "This is a new speech."}
 
-Use this 100-point Rubric:
-- Policy Alignment (40pts)
-- Rhetorical Impact (30pts)
-- Actionable Solutions (30pts)
+### EVALUATION PROTOCOL:
+1. **Deductive Analysis**: Start by identifying if the user addressed previous improvements.
+2. **Score Anchoring**: If this is a revision and improvements were made, the new score MUST be ≥ the previous score. You are only allowed to lower the score if a NEW major diplomatic error was introduced.
+3. **Rubric Math**:
+   - Policy Alignment (40pts)
+   - Rhetorical Impact (30pts)
+   - Actionable Solutions (30pts)
 
-SCORING DIRECTIVE: 
-- Be ruthless with critiques but encouraging with the score if improvements are visible.
-- If the score is above 90, only suggest "Master-level" refinements.
+### OUTPUT REQUIREMENTS:
+Return ONLY a JSON object. You must explain your reasoning in the "reasoning" field BEFORE setting the score.
 
-Return strictly valid JSON:
 {
+  "reasoning": "Briefly explain why the score changed or stayed the same relative to the previous ${previousScore || 0}",
   "score": number, 
-  "strengths": string[], 
-  "improvements": string[], 
-  "revised_opening": string,
-  "feedback_tone": "encouraging" | "critical" | "impressed"
+  "strengths": string[],
+  "improvements": string[],
+  "revised_opening": string
 }
 
-Speech text:
+Speech text to evaluate:
 """
 ${speechText}
 """
 `;
 
   const responseText = await generateText(prompt);
-  if (!responseText) {
-    throw new Error("Failed to generate response");
-  }
+  if (!responseText) throw new Error("Failed to generate response");
 
-  // Regex to ensure we only parse the JSON block
   const jsonMatch = responseText.match(/\{[\s\S]*\}/);
   const cleanJson = jsonMatch ? jsonMatch[0] : responseText;
 
   try {
     const result = JSON.parse(cleanJson);
     
-    // Logic Guard: If the AI is being "lazy" and giving the same score despite improvements, 
-    // we can manually nudge it in the frontend, but the prompt above usually fixes this.
+    // FINAL SAFETY GUARD: If the AI ignores instructions and lowers the score, 
+    // we force it to stay at the previous level in the UI.
+    if (previousScore && result.score < previousScore) {
+      result.score = previousScore; 
+      result.reasoning = "Score maintained at previous level to ensure consistency during refinement.";
+    }
+
     return result;
   } catch (e) {
-    console.error("AI returned invalid JSON:", responseText);
-    throw new Error("Invalid response format from AI");
+    throw new Error("Invalid AI response");
   }
 }
